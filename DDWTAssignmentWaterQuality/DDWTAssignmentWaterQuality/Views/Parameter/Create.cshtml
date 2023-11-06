@@ -1,0 +1,76 @@
+﻿<div class="bg-light py-1 mt-2 text-center">
+    <h2 class="text-center">Add New Parameter</h2>
+</div>
+
+@using WebMatrix.Data;
+@{
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+
+
+}
+
+
+@{
+    if (IsPost)
+    {
+        
+        var paramName = Request.Form["paramName"];
+        var units = Request.Form["units"];
+        var healthGuideline = Request.Form["healthGuideline"];
+        var aestheticGuideline = Request.Form["aestheticGuideline"];
+        var paramDescription = Request.Form["paramDescription"];
+       
+
+
+
+        var insertQuery = "INSERT INTO TestParameters (paramName, units, healthGuidline, aestheticGuidline, paramDescription) " +
+                          "VALUES (@0, @1, @2, @3, @4)";
+
+        db.Execute(insertQuery,paramName, units, healthGuideline, aestheticGuideline, paramDescription);
+
+        // Redirect to a success page or another page as needed
+        Response.Redirect("/Parameter/Index");
+    }
+}
+
+<h1>Create New Test Parameter</h1>
+
+<form method="post" action="/Parameter/Create">
+
+   
+    <div class="form-group">
+        <label for="paramName">Parameter Name</label>
+        <input type="text" class="form-control" id="paramName" name="paramName" required>
+    </div>
+
+    <div class="form-group">
+        <label for="units">Units</label>
+        <input type="text" class="form-control" id="units" name="units" required>
+    </div>
+
+    <div class="form-group">
+        <label for="healthGuideline">Health Guideline</label>
+        <input type="text" class="form-control" id="healthGuideline" name="healthGuideline" required>
+    </div>
+
+    <div class="form-group">
+        <label for="aestheticGuideline">Aesthetic Guideline</label>
+        <input type="text" class="form-control" id="aestheticGuideline" name="aestheticGuideline" required>
+    </div>
+
+    <div class="form-group">
+        <label for="paramDescription">Description</label>
+        <textarea class="form-control" id="paramDescription" name="paramDescription" required></textarea>
+    </div>
+
+    <!-- Automatically generate the parameter ID -->
+
+
+
+    <button type="submit" class="btn btn-primary">Create Parameter</button>
+</form>
+
+
+
+
+

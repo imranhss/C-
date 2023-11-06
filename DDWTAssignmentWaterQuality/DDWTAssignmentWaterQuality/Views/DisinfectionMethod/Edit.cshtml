@@ -1,0 +1,46 @@
+﻿<div class="bg-light py-1 mt-2 text-center">
+    <h2 class="text-center">Update Disinfection Method</h2>
+</div>
+
+@using WebMatrix.Data;
+@{
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+
+    // Retrieve the "id" from the query string to identify the method to edit
+    var disID = Request.QueryString["id"];
+
+    // Retrieve the existing method's data
+    var existingMethod = db.QuerySingle("SELECT * FROM DisinfectionMethods WHERE disID = @0", disID);
+
+    if (IsPost)
+    {
+        // Retrieve edited form data
+        var disName = Request.Form["disName"];
+        var disDescription = Request.Form["disDescription"];
+
+        // Update the database with the edited values
+        var updateQuery = "UPDATE DisinfectionMethods SET disName = @0, disDescription = @1 WHERE disID = @2";
+        db.Execute(updateQuery, disName, disDescription, disID);
+
+        // Redirect to a success page or another page as needed
+        Response.Redirect("/DisinfectionMethod/Index");
+    }
+}
+
+<h1>Edit Disinfection Method</h1>
+
+<form method="post" action="/DisinfectionMethod/Edit?id=@disID">
+    <div class="form-group">
+        <label for="disName">Name</label>
+        <input type="text" class="form-control" id="disName" name="disName" value="@existingMethod.disName">
+    </div>
+
+    <div class="form-group">
+        <label for="disDescription">Description</label>
+        <textarea class="form-control" id="disDescription" name="disDescription">@existingMethod.disDescription</textarea>
+    </div>
+
+    <input type="hidden" name="id" value="@disID">
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>

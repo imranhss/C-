@@ -1,0 +1,76 @@
+﻿<!-- pass this page the regionID, systemID and parameterID -->
+<!-- avgValue should only have 2 digits after the delimal point -->
+<!-- Dates should be in dd/mm/yyyy -->
+@using WebMatrix.Data;
+@{
+    var regionId = Request["rid"];
+    var systemId = Request["sid"];
+    var paramId = Request["pid"];
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+
+    // Fetch additional information
+    var regionName = db.QueryValue("SELECT regionName FROM Regions WHERE regionID = @0", regionId);
+    var systemName = db.QueryValue("SELECT systemName FROM WaterQualitySystems WHERE systemID = @0", systemId);
+    var paramName = db.QueryValue("SELECT paramName FROM TestParameters WHERE paramID = @0", paramId);
+
+    var sql = "SELECT sd.recordID, sd.avgValue, sd.healthCompliance, " +
+              "CONVERT(varchar, sd.endDateStart, 103) AS StartDate, " +
+              "CONVERT(varchar, sd.endDateEnd, 103) AS EndDate, " +
+              "dm.disName " +
+              "FROM SampleData AS sd " +
+              "LEFT JOIN SampleDisinfectionMethods AS sdm ON sd.recordID = sdm.recordID " +
+              "LEFT JOIN DisinfectionMethods AS dm ON sdm.disID = dm.disID " +
+              "WHERE sd.regionID = @0 AND sd.systemID = @1 AND sd.paramID = @2 " +
+              "ORDER BY sd.recordID";
+    var sampleData = db.Query(sql, regionId, systemId, paramId);
+}
+<h1 class="text-info my-3">Water Quality System Sample Data Details</h1>
+<div class="bg-light p-3 mt-2 font-weight-bold h2">
+
+  
+    
+        <p>[Water Quality System]: @systemName</p>
+        <p>[Region Name]: @regionName</p>
+        <p>[Parameter Name]: @paramName</p>
+    
+
+</div>
+
+
+
+@if (sampleData.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Record ID</th>
+                <th>Average Value</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+
+                <th>Disinfection Method</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in sampleData)
+            {
+                <tr>
+                    <td>@row.recordID</td>
+                    <td>@(row.avgValue != null ? string.Format("{0:0.00}", row.avgValue) : "0.00")</td>
+                    <td>@row.StartDate</td>
+                    <td>@row.EndDate</td>
+
+                    <td>
+                        <a class="btn btn-outline-info" href="/DisinfectionMethod/Details?id=@row.recordID">Disinfection Methods</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No sample data available for this region, water quality system, and test parameter.</p>
+}
+

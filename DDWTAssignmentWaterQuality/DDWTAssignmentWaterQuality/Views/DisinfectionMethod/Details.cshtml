@@ -1,0 +1,48 @@
+﻿
+@using WebMatrix.Data;
+@{
+    var recordId = Request["id"];
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+
+    var sql = "SELECT dm.disID, dm.disName, dm.disDescription " +
+              "FROM DisinfectionMethods AS dm " +
+              "JOIN SampleDisinfectionMethods AS sdm ON dm.disID = sdm.disID " +
+              "WHERE sdm.recordID = @0";
+    var disinfectionMethods = db.Query(sql, recordId);
+    var recordTitle = "Disinfection Methods Used For " + recordId;
+}
+
+<h2 class="text-info text-center">Water Quality System Sample Data Details</h2>
+
+<div class="bg-light p-1 mt-2 font-weight-bold h2">
+    <h1>@recordTitle</h1>
+</div>
+
+    
+
+    @if (disinfectionMethods.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Method ID</th>
+                    <th>Method Name</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var method in disinfectionMethods)
+                {
+                    <tr>
+                        <td>@method.disID</td>
+                        <td>@method.disName</td>
+                        <td>@method.disDescription</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No disinfection methods used for this sample data record.</p>
+    }

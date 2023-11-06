@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html  lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA Water Quality - UniSA Online STEM</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-2">
+        <a class="navbar-brand" href="/">SA Water Quality</a>
+        
+        <div class="container collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item btn @isActive("Index")">
+                    <a class="nav-link" href="/Home/Index">Home</a>
+                </li>
+                <li class="nav-item btn @isActive("System")">
+                    <a class="nav-link" href="/System/Index">System</a>
+                </li>
+
+                <li class="nav-item btn @isActive("Parameter")">
+                    <a class="nav-link" href="/Parameter/Index">Parameter</a>
+                </li>
+
+                <li class="nav-item btn @isActive("DisinfectionMethod")">
+                    <a class="nav-link" href="/DisinfectionMethod/Index">Disinfection Method</a>
+                </li>
+
+                <li class="nav-item btn @isActive("About")">
+                    <a href="/Home/About" class="nav-link">About</a>
+                </li>
+                <li class="nav-item btn @isActive("Contact")">
+                    <a href="/Home/Contact" class="nav-link">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <main class="container">
+        <div class="row justify-content-center">
+            <div class="col-9">
+                @RenderBody()
+            </div>
+        </div>
+        <hr />
+
+    </main>
+    <footer class="container text-center">
+        <p>&copy; @DateTime.Now.Year - UniSA Online STEM</p>
+    </footer>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    @functions {
+
+        public string isActive(string q)
+        {
+            string str = "";
+            if (q == ViewBag.Active) { str = "active btn-warning"; }
+            return str;
+        }
+    }
+
+</body>
+</html>

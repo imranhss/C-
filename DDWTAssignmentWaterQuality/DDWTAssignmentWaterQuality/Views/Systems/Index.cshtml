@@ -1,0 +1,84 @@
+﻿@using WebMatrix.Data;
+<!-- All values of avgValue should only have 2 digits after the delimal point -->
+
+
+@{
+    var systemId = Request["id"];
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+
+    var sql = "SELECT r.regionID, r.regionName, tp.paramID, tp.paramName, " +
+              "MIN(sd.avgValue) AS MinimumValue, MAX(sd.avgValue) AS MaximumValue, " +
+              "AVG(sd.avgValue) AS AverageValue " +
+              "FROM SampleData AS sd " +
+              "JOIN Regions AS r ON sd.regionID = r.regionID " +
+              "JOIN TestParameters AS tp ON sd.paramID = tp.paramID " +
+              "WHERE sd.systemID = @0 " +
+              "GROUP BY r.regionID, r.regionName, tp.paramID, tp.paramName " +
+              "ORDER BY r.regionName, tp.paramName";
+    var sampleData = db.Query(sql, systemId);
+
+    var townSuburbName = GetTownSuburbName(systemId);
+}
+
+<h2 class="text-info text-center">Sample Data Record</h2>
+
+
+
+@if (sampleData.Any())
+{<div class="bg-light p-3 mt-2 ">
+        <h2 class="">Water Quality System: @townSuburbName</h2>
+    </div>
+
+    <table class="table table-striped">
+
+        <thead>
+            <tr>
+                <th>Region</th>
+                <th>Test Parameter</th>
+                <th>Minimum Value</th>
+                <th>Maximum Value</th>
+                <th>Average Value</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in sampleData)
+            {
+                <tr>
+                    <td>@row.regionName</td>
+                    <td>@row.paramName</td>
+                    <td>@row.regionName</td>
+                    <td>@row.paramName</td>
+                    <td>@(row.MinimumValue != null ? string.Format("{0:0.00}", row.MinimumValue) : "0.00")</td>
+                    <td>@(row.MaximumValue != null ? string.Format("{0:0.00}", row.MaximumValue) : "0.00")</td>
+                    <td>@(row.AverageValue != null ? string.Format("{0:0.00}", row.AverageValue) : "0.00")</td>
+                    <td>
+                        <a href="/Systems/Details?rid=@row.regionID&amp;sid=@systemId&amp;pid=@row.paramID" class="btn btn-outline-info">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No condensed sample data available for this water quality system.</p>
+}
+
+@functions {
+    // Function to fetch the TownSuburbName based on the system ID
+    private string GetTownSuburbName(String systemId)
+    {
+
+        var db = Database.Open("WaterQuality"); // Replace with your database name
+
+
+        var townSuburbNameQuery = "SELECT ts.townSuburbName " +
+                                  "FROM TownsSuburbs AS ts " +
+                                  "JOIN TownWaterQualitySystems AS twqs ON ts.tsID = twqs.tsID " +
+                                  "WHERE twqs.systemID = @0";
+        var townSuburbName = db.QueryValue(townSuburbNameQuery, systemId);
+        return townSuburbName;
+
+    }
+}

@@ -1,0 +1,77 @@
+﻿@using WebMatrix.Data;
+
+@{
+    var db = Database.Open("WaterQuality"); // Use your database name
+
+    var region = Request.Form["region"];
+    var town = Request.Form["town"];
+
+    var sql = "SELECT wqs.systemID, wqs.systemName, r.regionName, ts.townSuburbName " +
+              "FROM WaterQualitySystems AS wqs " +
+              "JOIN RegionSystems AS rs ON wqs.systemID = rs.systemID " +
+              "JOIN Regions AS r ON rs.regionID = r.regionID " +
+              "JOIN TownWaterQualitySystems AS twqs ON wqs.systemID = twqs.systemID " +
+              "JOIN TownsSuburbs AS ts ON twqs.tsID = ts.tsID " +
+              "WHERE (r.regionName LIKE @0 + '%') AND (ts.townSuburbName LIKE @1 + '%') " +
+              "ORDER BY wqs.systemName ASC";
+
+    var data = db.Query(sql, region, town);
+}
+
+<div class="bg-light py-1 mt-2 text-center">
+    <h2 class="text-center">Water Quality System Search</h2>
+</div>
+
+<h2>System Details</h2>
+
+<form method="post" class="mt-3">
+    <div class="row">
+        <div class="form-group col-md-6">
+            <label for="region">Region:</label>
+            <input type="text" class="form-control" name="region" id="region" value="@region" placeholder="Region Search" />
+        </div>
+        <div class="form-group col-md-6">
+            <label for="town">Town/Suburb:</label>
+            <input type="text" class="form-control" name="town" id="town" value="@town" placeholder="Town/Suburb Search" />
+        </div>
+    </div>
+    <button type="submit" class="btn btn-success my-3">Search</button>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(region) && !string.IsNullOrWhiteSpace(town))
+{
+    if (data.Count() > 0)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>System Name</th>
+                    <th>Region</th>
+                    <th>Town/Suburb</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var system in data)
+                {
+                    <tr>
+                        <td>@system.systemName</td>
+                        <td>@system.regionName</td>
+                        <td>@system.townSuburbName</td>
+                        <td>
+                            <a href="/Systems/Index?id=@system.systemID" class="btn btn-outline-info">Details</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+<p class="bg-danger p-3 text-light h5  rounded">No records returned satifying the search criteria</p>
+    }
+}
+else
+{
+    <p class="bg-info p-3 text-light h5  rounded">Please provide both search criteria.</p>
+}

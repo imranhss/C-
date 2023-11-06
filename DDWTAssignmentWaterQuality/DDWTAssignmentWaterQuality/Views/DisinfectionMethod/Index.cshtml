@@ -1,0 +1,34 @@
+﻿@using WebMatrix.Data;
+
+<div class="bg-light py-1 mt-2 text-center">
+    <h2 class="text-center">Disinfection Methods</h2>
+</div>
+
+@{
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+    var disinfectionMethods = db.Query("SELECT * FROM DisinfectionMethods");
+}
+
+<a href="/DisinfectionMethod/Create" class="btn btn-outline-success my-3">Add New</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Edit</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var method in disinfectionMethods)
+        {
+            <tr>
+                <td>@method.disID</td>
+                <td>@method.disName</td>
+                <td>@method.disDescription</td>
+                <td><a href="/DisinfectionMethod/Edit?id=@method.disID" class="btn btn-outline-warning">Edit</a></td>
+                <td><a href="/DisinfectionMethod/Details?id=@method.disID" class="btn btn-outline-info">Details</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

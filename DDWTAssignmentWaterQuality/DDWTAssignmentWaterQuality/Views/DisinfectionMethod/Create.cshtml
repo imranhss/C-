@@ -1,0 +1,39 @@
+﻿@using WebMatrix.Data;
+
+
+@{
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+
+    if (IsPost)
+    {
+        // Retrieve form data
+        var disName = Request.Form["disName"];
+        var disDescription = Request.Form["disDescription"];
+
+        // Insert the new disinfection method into the database, excluding the identity column
+        var insertQuery = "INSERT INTO DisinfectionMethods (disName, disDescription) VALUES (@0, @1)";
+        db.Execute(insertQuery, disName, disDescription);
+
+        // Redirect to a success page or another page as needed
+        Response.Redirect("/DisinfectionMethod/Index");
+    }
+}
+
+<div class="bg-light py-1 mt-2 text-center">
+    <h2 class="text-center">Add Disinfection Method</h2>
+</div>
+
+
+<form method="post">
+    <div class="form-group">
+        <label for="disName">Name</label>
+        <input type="text" class="form-control" id="disName" name="disName" required>
+    </div>
+
+    <div class="form-group">
+        <label for="disDescription">Description</label>
+        <textarea class="form-control" id="disDescription" name="disDescription" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Disinfection Method</button>
+</form>

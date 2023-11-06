@@ -1,0 +1,44 @@
+﻿
+
+@using WebMatrix.Data;
+@{
+    var db = Database.Open("WaterQuality"); // Replace with your database name
+    var testParameters = db.Query("SELECT * FROM TestParameters");
+}
+<h2 class="text-center">Test Parameters</h2>
+
+
+<a href="/Parameter/Create" class="btn btn-outline-primary my-3">Create New Parameter</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Parameter ID</th>
+            <th>Parameter Name</th>
+            <th>Units</th>
+            <th>Health Guideline</th>
+            <th>Aesthetic Guideline</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var parameter in testParameters)
+        {
+            <tr>
+                <td>@parameter.paramID</td>
+                <td>@parameter.paramName</td>
+                <td>@parameter.units</td>
+                <td>@parameter.healthGuidline</td>
+                <td>@parameter.aestheticGuidline</td>
+                <td>@parameter.paramDescription</td>
+                <td>
+                    <a href="/Parameter/Edit?id=@parameter.paramID" class="btn btn-outline-warning">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
